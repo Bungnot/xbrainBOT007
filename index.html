@@ -3,1173 +3,870 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>บอท LINE จัดการบิลอัตโนมัติ</title>
+<title>สรุปยอดอีสาน OG — คู่มือระบบบอท</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;900&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #08070f;
-    --bg2: #0d0b1e;
-    --bg3: #13112a;
-    --border: #2a2550;
-    --border2: #3a3470;
-    --purple: #4a3fa0;
-    --purple2: #6357c4;
-    --accent: #a89de8;
-    --text: #f0ede8;
-    --text2: #9d9ab8;
-    --text3: #5c5a7a;
-    --green: #5ac98e;
-    --amber: #f0b94a;
-    --red: #e05a5a;
+    --bg: #0a0c10;
+    --bg2: #0f1318;
+    --bg3: #151a22;
+    --card: #131920;
+    --card2: #1a2330;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --gold: #e8b84b;
+    --gold2: #f5d078;
+    --gold-dim: rgba(232,184,75,0.12);
+    --gold-glow: rgba(232,184,75,0.25);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.1);
+    --coral: #f87171;
+    --coral-dim: rgba(248,113,113,0.1);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.1);
+    --green: #4ade80;
+    --green-dim: rgba(74,222,128,0.1);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.1);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.1);
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --font-th: 'Kanit', sans-serif;
+    --font-body: 'Sarabun', sans-serif;
+    --r: 12px;
+    --r2: 8px;
   }
 
-  html { scroll-behavior: smooth; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Noto Sans Thai', sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
+    font-family: var(--font-body);
+    min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 0 1.5rem;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(8,7,15,0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .nav-logo {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 17px;
-    color: var(--text);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .nav-logo span {
-    display: inline-block;
-    width: 28px; height: 28px;
-    background: var(--purple);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
-  }
-
-  .nav-cta {
-    background: var(--purple);
-    color: #fff;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-family: inherit;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background .18s;
-  }
-  .nav-cta:hover { background: var(--purple2); }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 100px 1.5rem 4rem;
-    position: relative;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, #1a1445 0%, transparent 70%);
-  }
-
-  .hero::before {
+  /* ── noise overlay ── */
+  body::before {
     content: '';
-    position: absolute;
-    inset: 0;
-    background: 
-      radial-gradient(circle at 20% 50%, rgba(74,63,160,0.12) 0%, transparent 50%),
-      radial-gradient(circle at 80% 50%, rgba(90,201,142,0.06) 0%, transparent 50%);
-    pointer-events: none;
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
   }
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(74,63,160,0.2);
-    border: 1px solid rgba(74,63,160,0.5);
-    color: var(--accent);
-    font-size: 12px;
-    padding: 5px 14px;
-    border-radius: 99px;
-    margin-bottom: 1.8rem;
-    letter-spacing: 0.04em;
+  /* ── top grid lines bg ── */
+  body::after {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; height: 400px;
+    background:
+      linear-gradient(rgba(232,184,75,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,184,75,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
   }
 
-  .badge::before { content: '●'; font-size: 8px; color: var(--green); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
-  h1 {
-    font-family: 'Space Grotesk', 'Noto Sans Thai', sans-serif;
-    font-size: clamp(2.2rem, 8vw, 4rem);
-    font-weight: 700;
-    line-height: 1.12;
-    margin-bottom: 1.2rem;
-    background: linear-gradient(135deg, #fff 20%, #a89de8 60%, #7c6fe0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  /* ── HERO ── */
+  .hero {
+    padding: 60px 0 40px;
+    text-align: center;
+    position: relative;
   }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--gold-dim); border: 1px solid rgba(232,184,75,0.3);
+    border-radius: 999px; padding: 6px 18px;
+    font-family: var(--font-th); font-size: 13px; font-weight: 500;
+    color: var(--gold); letter-spacing: 0.04em;
+    margin-bottom: 24px;
+    animation: fadeDown 0.6s ease both;
+  }
+  .hero-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+  .hero h1 {
+    font-family: var(--font-th); font-weight: 900;
+    font-size: clamp(36px, 6vw, 72px); line-height: 1.05;
+    letter-spacing: -0.02em;
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--gold), var(--gold2) 40%, var(--amber));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
   .hero-sub {
-    font-size: clamp(15px, 3vw, 18px);
-    color: var(--text2);
-    max-width: 480px;
-    margin: 0 auto 2.5rem;
-    line-height: 1.75;
+    font-family: var(--font-body); font-size: 17px; color: var(--text2);
+    margin: 16px 0 0; font-weight: 300; letter-spacing: 0.01em;
+    animation: fadeDown 0.6s 0.2s ease both;
   }
 
-  .cta-row {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 3.5rem;
+  @keyframes fadeDown {
+    from { opacity:0; transform: translateY(-16px); }
+    to   { opacity:1; transform: translateY(0); }
   }
 
-  .btn {
-    padding: 13px 28px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all .18s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  /* ── STAT BAR ── */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: var(--r);
+    margin: 40px 0 56px; overflow: hidden;
+    animation: fadeUp 0.6s 0.3s ease both;
   }
-
-  .btn-primary {
-    background: var(--purple);
-    color: #fff;
-    border: none;
-    box-shadow: 0 4px 24px rgba(74,63,160,0.4);
-  }
-  .btn-primary:hover { background: var(--purple2); transform: translateY(-1px); box-shadow: 0 6px 28px rgba(74,63,160,0.5); }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--border2);
-  }
-  .btn-ghost:hover { background: rgba(74,63,160,0.15); }
-
-  /* CHAT MOCKUP */
-  .mockup-container {
-    position: relative;
-    max-width: 340px;
-    margin: 0 auto;
-  }
-
-  .mockup-glow {
-    position: absolute;
-    inset: -20px;
-    background: radial-gradient(ellipse, rgba(74,63,160,0.25) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .mockup {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.2rem;
-    position: relative;
-  }
-
-  .mockup-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 1rem;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mockup-avatar {
-    width: 32px; height: 32px;
-    background: #06c755;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-  }
-
-  .mockup-name { font-size: 13px; font-weight: 500; color: var(--text); }
-  .mockup-status { font-size: 11px; color: var(--green); }
-
-  .bubble {
-    padding: 9px 13px;
-    border-radius: 14px;
-    font-size: 13.5px;
-    line-height: 1.6;
-    margin-bottom: 7px;
-    max-width: 90%;
-  }
-
-  .bubble-left {
-    background: #1f1d35;
-    border-radius: 4px 14px 14px 14px;
-    color: #d5d2f0;
-  }
-
-  .bubble-right {
-    background: var(--purple);
-    border-radius: 14px 4px 14px 14px;
-    color: #fff;
-    margin-left: auto;
-  }
-
-  .bubble-system {
-    background: rgba(90,201,142,0.1);
-    border: 1px solid rgba(90,201,142,0.25);
-    border-radius: 10px;
-    color: var(--green);
-    font-size: 12.5px;
-    padding: 8px 12px;
+  .stat {
+    background: var(--card); padding: 20px 24px;
     text-align: center;
-    margin-bottom: 7px;
+  }
+  .stat-n {
+    font-family: var(--font-th); font-size: 28px; font-weight: 700;
+    color: var(--gold); line-height: 1;
+  }
+  .stat-l { font-size: 13px; color: var(--text3); margin-top: 4px; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(20px); }
+    to   { opacity:1; transform: translateY(0); }
   }
 
-  .hl { color: var(--accent); font-weight: 600; }
-  .hl-green { color: var(--green); font-weight: 600; }
-  .hl-amber { color: var(--amber); font-weight: 600; }
-
-  /* SECTIONS */
-  section { padding: 5rem 1.5rem; }
-  .container { max-width: 720px; margin: 0 auto; }
-
-  .section-pill {
-    display: inline-block;
-    background: rgba(74,63,160,0.15);
-    border: 1px solid rgba(74,63,160,0.4);
-    color: var(--accent);
-    font-size: 11.5px;
-    padding: 4px 12px;
-    border-radius: 99px;
-    margin-bottom: 0.8rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  /* ── SECTION TITLE ── */
+  .sec-title {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
   }
-
-  h2 {
-    font-size: clamp(1.6rem, 5vw, 2.4rem);
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 0.6rem;
-  }
-
-  .section-desc {
-    font-size: 15px;
-    color: var(--text2);
-    max-width: 440px;
-    line-height: 1.7;
-    margin-bottom: 2.5rem;
-  }
-
-  /* FEATURES GRID */
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 14px;
-  }
-
-  .feat-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.3rem 1.1rem;
-    transition: border-color .2s, transform .2s;
-  }
-
-  .feat-card:hover {
-    border-color: var(--border2);
-    transform: translateY(-2px);
-  }
-
-  .feat-icon {
-    width: 42px; height: 42px;
-    background: rgba(74,63,160,0.2);
-    border-radius: 11px;
+  .sec-icon {
+    width: 36px; height: 36px; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    margin-bottom: 12px;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .sec-title h2 {
+    font-family: var(--font-th); font-size: 20px; font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .sec-title p { font-size: 13px; color: var(--text3); margin-top: 2px; }
+
+  /* ── CARDS GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 24px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+  .card-accent {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: var(--r) var(--r) 0 0;
+  }
+  .card-tag {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+    display: inline-block; margin-bottom: 12px;
+  }
+  .card h3 {
+    font-family: var(--font-th); font-size: 17px; font-weight: 600; margin-bottom: 12px;
   }
 
-  .feat-title {
-    font-size: 14.5px;
-    font-weight: 500;
-    color: #ddd8f8;
-    margin-bottom: 5px;
+  /* ── CMD TABLE ── */
+  .cmd-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .cmd-table tr { border-bottom: 1px solid var(--border); }
+  .cmd-table tr:last-child { border-bottom: none; }
+  .cmd-table td { padding: 8px 0; vertical-align: top; }
+  .cmd-table td:first-child {
+    font-family: 'Courier New', monospace; font-size: 13px;
+    color: var(--gold); white-space: nowrap; width: 1%; padding-right: 16px;
   }
+  .cmd-table td:last-child { color: var(--text2); }
 
-  .feat-desc {
-    font-size: 13px;
-    color: var(--text3);
-    line-height: 1.6;
-  }
-
-  /* FLOW */
-  .flow-bg { background: var(--bg2); }
-
-  .flow-steps {
-    display: flex;
-    flex-direction: column;
-    max-width: 520px;
-    margin: 0 auto;
-  }
-
+  /* ── FLOW STEPS ── */
+  .flow { display: flex; gap: 0; margin: 0; position: relative; }
   .flow-step {
-    display: flex;
-    gap: 16px;
+    flex: 1; position: relative;
+    background: var(--card); border: 1px solid var(--border);
+    padding: 16px 14px 14px;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%, 18px 50%);
+    margin-left: -1px;
+  }
+  .flow-step:first-child {
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
+    margin-left: 0;
+  }
+  .flow-step:last-child {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 18px 50%);
+  }
+  .flow-n {
+    font-family: var(--font-th); font-size: 11px; font-weight: 700;
+    color: var(--gold); letter-spacing: 0.08em; margin-bottom: 4px;
+  }
+  .flow-t {
+    font-family: var(--font-th); font-size: 13px; font-weight: 600; line-height: 1.3;
+  }
+  .flow-s { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.4; }
+
+  /* ── RESULT TABLE ── */
+  .result-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .result-table thead tr { background: var(--card2); }
+  .result-table th {
+    font-family: var(--font-th); font-weight: 600; font-size: 13px;
+    padding: 10px 14px; text-align: left; color: var(--text2);
+    border-bottom: 1px solid var(--border2);
+  }
+  .result-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  .result-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .result-table td { padding: 10px 14px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  }
+  .badge-win { background: var(--green-dim); color: var(--green); }
+  .badge-lose { background: var(--coral-dim); color: var(--coral); }
+  .badge-draw { background: rgba(148,163,184,0.1); color: var(--text2); }
+
+  /* ── CREDIT FLOW ── */
+  .credit-flow {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 16px; background: var(--bg3); border-radius: var(--r2);
+    margin-top: 12px;
+  }
+  .cf-box {
+    flex: 1; min-width: 120px; text-align: center;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r2); padding: 12px 10px;
+  }
+  .cf-box .lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .cf-box .val { font-family: var(--font-th); font-size: 15px; font-weight: 600; }
+  .cf-arrow { color: var(--text3); font-size: 20px; flex-shrink: 0; }
+
+  /* ── TAG PILLS ── */
+  .pill {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; border: 1px solid;
+  }
+  .pill-gold   { background: var(--gold-dim);   border-color: rgba(232,184,75,0.3);  color: var(--gold); }
+  .pill-teal   { background: var(--teal-dim);   border-color: rgba(45,212,191,0.3);  color: var(--teal); }
+  .pill-coral  { background: var(--coral-dim);  border-color: rgba(248,113,113,0.3); color: var(--coral); }
+  .pill-blue   { background: var(--blue-dim);   border-color: rgba(96,165,250,0.3);  color: var(--blue); }
+  .pill-purple { background: var(--purple-dim); border-color: rgba(167,139,250,0.3); color: var(--purple); }
+  .pill-green  { background: var(--green-dim);  border-color: rgba(74,222,128,0.3);  color: var(--green); }
+  .pill-amber  { background: var(--amber-dim);  border-color: rgba(251,191,36,0.3);  color: var(--amber); }
+
+  /* ── LIST ITEMS ── */
+  .item-list { list-style: none; }
+  .item-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 7px 0; border-bottom: 1px solid var(--border);
+    font-size: 14px; color: var(--text2);
+  }
+  .item-list li:last-child { border-bottom: none; }
+  .item-list li::before {
+    content: '›'; color: var(--gold); font-size: 16px;
+    flex-shrink: 0; line-height: 1.4;
+  }
+  .item-list strong {
+    font-family: 'Courier New', monospace; font-size: 13px;
+    color: var(--gold); margin-right: 4px;
   }
 
-  .step-left {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-  }
+  /* ── SECTION ── */
+  .section { margin-bottom: 56px; }
 
-  .step-num {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    background: var(--purple);
-    color: #fff;
-    font-weight: 700;
-    font-size: 15px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 0 4px rgba(74,63,160,0.2);
-  }
-
-  .step-line {
-    width: 2px;
-    flex: 1;
-    background: linear-gradient(to bottom, var(--purple), transparent);
-    margin: 6px 0;
-    min-height: 30px;
-  }
-
-  .step-body {
-    padding: 2px 0 2.2rem;
-  }
-
-  .step-title {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 5px;
-  }
-
-  .step-desc {
-    font-size: 13.5px;
-    color: var(--text2);
-    line-height: 1.65;
-  }
-
-  /* SLIP SECTION */
-  .slip-wrap {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-
-  @media (max-width: 560px) {
-    .slip-wrap { grid-template-columns: 1fr; }
-  }
-
-  .slip-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .slip-card-header {
-    background: rgba(90,201,142,0.08);
-    border-bottom: 1px solid rgba(90,201,142,0.2);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .slip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-  .slip-header-text { font-size: 13px; color: var(--green); font-weight: 500; }
-
-  .slip-body { padding: 14px 16px; }
-
-  .slip-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    font-size: 13.5px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-  .slip-row:last-child { border-bottom: none; }
-
-  .slip-key { color: var(--text3); }
-  .slip-val { color: var(--text); font-weight: 500; }
-
-  .info-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .info-item {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .info-icon {
-    width: 32px; height: 32px;
-    background: rgba(74,63,160,0.2);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .info-text { font-size: 13.5px; color: var(--text2); line-height: 1.6; }
-  .info-text strong { color: var(--text); }
-
-  /* STATS */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-bottom: 2.5rem;
-  }
-
-  .stat-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.2rem 1rem;
-    text-align: center;
-  }
-
-  .stat-num {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--accent);
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-
-  .stat-label {
-    font-size: 12px;
-    color: var(--text3);
-  }
-
-  /* PRICING */
-  .pricing-wrap {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .price-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 2rem 1.5rem;
-    position: relative;
-  }
-
-  .price-card.featured {
-    border-color: var(--purple);
-    box-shadow: 0 0 40px rgba(74,63,160,0.3);
-  }
-
-  .price-popular {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--purple);
-    color: #fff;
-    font-size: 11px;
-    padding: 4px 14px;
-    border-radius: 99px;
-    white-space: nowrap;
-    font-weight: 500;
-  }
-
-  .price-tier {
-    font-size: 12px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 10px;
-  }
-
-  .price-num {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .price-note {
-    font-size: 12.5px;
-    color: var(--text3);
-    margin-bottom: 1.5rem;
-  }
-
-  .price-list {
-    list-style: none;
-    margin-bottom: 1.8rem;
-  }
-
-  .price-list li {
-    font-size: 13.5px;
-    color: var(--text2);
-    padding: 5px 0;
-    padding-left: 22px;
-    position: relative;
-    line-height: 1.5;
-  }
-
-  .price-list li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--green);
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  .price-list li.dim { color: var(--text3); }
-  .price-list li.dim::before { color: var(--text3); content: '–'; }
-
-  /* TECH BADGES */
-  .tech-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 2rem;
-  }
-
-  .tech-badge {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    color: var(--text3);
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 6px;
-  }
-
-  /* FAQ */
-  .faq-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 580px;
-    margin: 0 auto;
-  }
-
-  .faq-item {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .faq-q {
-    padding: 15px 18px;
-    font-size: 14.5px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    user-select: none;
-    color: var(--text);
-  }
-
-  .faq-q::after {
-    content: '+';
-    font-size: 20px;
-    color: var(--accent);
-    transition: transform .2s;
-    flex-shrink: 0;
-  }
-
-  .faq-item.open .faq-q::after { transform: rotate(45deg); }
-
-  .faq-a {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height .3s ease, padding .3s;
-    font-size: 13.5px;
-    color: var(--text2);
-    line-height: 1.7;
-  }
-
-  .faq-a-inner {
-    padding: 0 18px 15px;
-  }
-
-  .faq-item.open .faq-a { max-height: 200px; }
-
-  /* CTA SECTION */
-  .cta-section {
-    text-align: center;
-    background: radial-gradient(ellipse 80% 100% at 50% 100%, #1a1445 0%, transparent 70%);
-  }
-
-  .cta-box {
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: 24px;
-    padding: 3rem 2rem;
-    max-width: 500px;
-    margin: 0 auto;
-    box-shadow: 0 0 60px rgba(74,63,160,0.2);
-  }
-
-  .cta-title {
-    font-size: clamp(1.5rem, 5vw, 2rem);
-    font-weight: 700;
-    margin-bottom: 0.8rem;
-  }
-
-  .cta-desc {
-    font-size: 15px;
-    color: var(--text2);
-    margin-bottom: 2rem;
-    line-height: 1.7;
-  }
-
-  .contact-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .contact-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 13px 18px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all .18s;
-  }
-
-  .contact-link:hover {
-    background: rgba(74,63,160,0.2);
-    border-color: var(--border2);
-    transform: translateX(4px);
-  }
-
-  .contact-link .icon { font-size: 20px; }
-  .contact-link .arrow { margin-left: auto; color: var(--text3); }
-
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 2rem 1.5rem;
-    border-top: 1px solid var(--border);
-    font-size: 12.5px;
-    color: var(--text3);
-    line-height: 2;
-  }
-
-  /* DIVIDER */
+  /* ── DIVIDER ── */
   .divider {
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--border), transparent);
+    display: flex; align-items: center; gap: 16px;
+    margin: 48px 0 32px; color: var(--text3); font-size: 12px;
+    letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
+  }
+  .divider::before,.divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
   }
 
-  /* SCROLL ANIMATE */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity .6s ease, transform .6s ease;
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 40px 0 60px;
+    color: var(--text3); font-size: 13px; border-top: 1px solid var(--border);
+    position: relative; z-index: 1;
   }
+  footer span { color: var(--gold); }
 
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
+  /* ── TABS ── */
+  .tab-bar {
+    display: flex; gap: 2px; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: var(--r2);
+    padding: 4px; margin-bottom: 20px; width: fit-content;
   }
+  .tab {
+    padding: 7px 18px; border-radius: 6px;
+    font-family: var(--font-th); font-size: 14px; font-weight: 500;
+    cursor: pointer; color: var(--text3); transition: all 0.2s; border: none;
+    background: transparent;
+  }
+  .tab.active { background: var(--card2); color: var(--text); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
-  @media (max-width: 520px) {
-    .stats-row { grid-template-columns: repeat(3, 1fr); }
-    .stat-num { font-size: 1.5rem; }
-    section { padding: 3.5rem 1.2rem; }
+  /* ── INFO BOX ── */
+  .info-box {
+    border-radius: var(--r2); padding: 14px 16px;
+    display: flex; gap: 12px; align-items: flex-start;
+    font-size: 14px; margin-top: 12px;
+  }
+  .info-box .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .info-box p { color: var(--text2); line-height: 1.6; }
+  .info-box strong { color: var(--text); }
+
+  /* ── SCROLL ANIMATION ── */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 2fr 2fr; }
+    .flow { flex-direction: column; gap: 4px; }
+    .flow-step { clip-path: none !important; margin: 0; border-radius: var(--r2); }
+    .tab-bar { flex-wrap: wrap; }
+    .credit-flow { flex-direction: column; }
+    .cf-arrow { transform: rotate(90deg); }
   }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">
-    <span>🤖</span>
-    BotBill Pro
-  </a>
-  <a class="nav-cta" href="#contact">ติดต่อสอบถาม</a>
-</nav>
-
 <!-- HERO -->
-<div class="hero">
-  <div class="badge">LINE Bot • ระบบอัตโนมัติ</div>
-  <h1>บอทจัดการบิล<br>ครบ จบ อัตโนมัติ</h1>
-  <p class="hero-sub">ระบบรับแทง จับคู่ แจ้งผล และเติมเครดิตผ่านสลิป ทำงานใน LINE กลุ่ม ไม่ต้องนับเอง ไม่ต้องคำนวณเอง</p>
-
-  <div class="cta-row">
-    <a class="btn btn-primary" href="#contact">ติดต่อซื้อเลย ↗</a>
-    <a class="btn btn-ghost" href="#features">ดูฟีเจอร์ทั้งหมด</a>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-badge">LINE Bot System · สรุปยอดอีสาน OG</div>
+    <h1>คู่มือ<span>บอทบริหารรอบ</span><br>บั้งไฟ</h1>
+    <p class="hero-sub">ระบบ Admin · การจัดการรอบ · เครดิต · แจ้งผล · Multi-base</p>
   </div>
 
-  <!-- Chat mockup -->
-  <div class="mockup-container fade-in">
-    <div class="mockup-glow"></div>
-    <div class="mockup">
-      <div class="mockup-header">
-        <div class="mockup-avatar">💬</div>
-        <div>
-          <div class="mockup-name">กลุ่มหน้าบ้าน</div>
-          <div class="mockup-status">● บอทออนไลน์</div>
-        </div>
-      </div>
-      <div class="bubble bubble-left">ชล <span class="hl">500</span></div>
-      <div class="bubble bubble-right">📋 บันทึกแผลแล้ว<br>รอจับคู่อยู่นะคะ</div>
-      <div class="bubble bubble-left">ชถ <span class="hl">500</span></div>
-      <div class="bubble-system">✅ จับคู่แล้ว • ล็อกบิล ฿500</div>
-      <div class="bubble bubble-left">แจ้งผล <span class="hl-green">365</span></div>
-      <div class="bubble bubble-right">🎉 รอบนี้สรุปแล้วค่ะ<br>ยอดรวม <span class="hl-amber">฿12,500</span><br>กำไรสุทธิ <span class="hl-green">฿1,250</span></div>
-    </div>
+  <!-- STAT BAR -->
+  <div class="stats reveal">
+    <div class="stat"><div class="stat-n">2</div><div class="stat-l">กลุ่มหลัก (หน้าบ้าน / หลังบ้าน)</div></div>
+    <div class="stat"><div class="stat-n">∞</div><div class="stat-l">รอบพร้อมกัน (Multi-base)</div></div>
+    <div class="stat"><div class="stat-n">Auto</div><div class="stat-l">เติมเครดิตจากสลิป (EasySlip)</div></div>
+    <div class="stat"><div class="stat-n">5%</div><div class="stat-l">Commission ค่าเริ่มต้น</div></div>
   </div>
 </div>
 
-<div class="divider"></div>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="container">
-    <div class="fade-in" style="text-align:center;margin-bottom:2.5rem">
-      <div class="section-pill">ฟีเจอร์หลัก</div>
-      <h2>ทำได้ทุกอย่าง<br>ในกลุ่ม LINE เดียว</h2>
-      <p class="section-desc" style="margin:0.5rem auto 0">ไม่ต้องใช้แอปอื่น ไม่ต้องนับเอง ระบบจัดการให้ครบตั้งแต่เปิดรอบจนถึงปิดรอบ</p>
+<!-- ── SECTION 1: โครงสร้างกลุ่ม ── -->
+<div class="wrap">
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--gold-dim);">🏛️</div>
+      <div><h2>โครงสร้างกลุ่มและสิทธิ์</h2><p>แบ่งเป็น 3 พื้นที่ทำงาน</p></div>
     </div>
-
-    <div class="features-grid fade-in">
-      <div class="feat-card">
-        <div class="feat-icon">🎯</div>
-        <div class="feat-title">รับแทงอัตโนมัติ</div>
-        <div class="feat-desc">พิมพ์สั้นๆ ระบบบันทึกและโพสต์รอจับคู่ให้ทันที</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🔗</div>
-        <div class="feat-title">จับคู่อัจฉริยะ</div>
-        <div class="feat-desc">Reply "ต" เพื่อติด บอทล็อกคู่และแจ้งยืนยันทุกฝ่าย</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">💳</div>
-        <div class="feat-title">เติมเครดิตผ่านสลิป</div>
-        <div class="feat-desc">ส่งสลิปในแชท ระบบตรวจและเติมเครดิตให้อัตโนมัติ</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">📊</div>
-        <div class="feat-title">สรุปยอด-กำไร</div>
-        <div class="feat-desc">รายงานยอด กำไร และค่าคอมมิชชั่นทุกรอบอัตโนมัติ</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🔒</div>
-        <div class="feat-title">ระบบหลังบ้าน</div>
-        <div class="feat-desc">แอดมินสั่งงานผ่านกลุ่มหลังบ้านแยกต่างหากจากหน้าบ้าน</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">⚡</div>
-        <div class="feat-title">หลายค่ายพร้อมกัน</div>
-        <div class="feat-desc">เปิดได้หลายค่ายในเวลาเดียว แยกรอบไม่ปะปนกัน</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🛡️</div>
-        <div class="feat-title">กัน Duplicate</div>
-        <div class="feat-desc">LINE retry หรือส่งซ้ำไม่ทำให้บิลหรือเครดิตซ้ำ</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">💾</div>
-        <div class="feat-title">Auto Backup</div>
-        <div class="feat-desc">บันทึกทุกรอบอัตโนมัติ ข้อมูลไม่หายเมื่อรีสตาร์ท</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🔄</div>
-        <div class="feat-title">ย้อนผลได้</div>
-        <div class="feat-desc">แก้ไขผลที่ผิดพลาดได้ มีระบบยืนยัน 2 ชั้นกัน พลาด</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- HOW IT WORKS -->
-<section class="flow-bg" id="howto">
-  <div class="container">
-    <div class="fade-in" style="text-align:center;margin-bottom:2.5rem">
-      <div class="section-pill">วิธีทำงาน</div>
-      <h2>ขั้นตอนง่ายๆ 4 สเต็ป</h2>
-      <p class="section-desc" style="margin:0.5rem auto 0">แอดมินเปิดรอบ ลูกค้าแทง ระบบจัดการ แจ้งผลเอง</p>
-    </div>
-
-    <div class="flow-steps fade-in">
-      <div class="flow-step">
-        <div class="step-left">
-          <div class="step-num">1</div>
-          <div class="step-line"></div>
-        </div>
-        <div class="step-body">
-          <div class="step-title">แอดมินเปิดรอบ</div>
-          <div class="step-desc">พิมพ์คำสั่งเปิดรอบในกลุ่มหลังบ้าน บอทพร้อมรับแทงจากกลุ่มหน้าบ้านทันที</div>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="step-left">
-          <div class="step-num">2</div>
-          <div class="step-line"></div>
-        </div>
-        <div class="step-body">
-          <div class="step-title">ลูกค้าโพสต์แผล</div>
-          <div class="step-desc">พิมพ์สั้นๆ เช่น "ชล500" หรือ "ชถ1000" บอทรับและโพสต์แผลรอจับคู่ให้อัตโนมัติ</div>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="step-left">
-          <div class="step-num">3</div>
-          <div class="step-line"></div>
-        </div>
-        <div class="step-body">
-          <div class="step-title">จับคู่และล็อกบิล</div>
-          <div class="step-desc">ลูกค้าอีกคน Reply โพสต์แผลด้วย "ต" หรือ "ติด" บอทล็อกคู่และแจ้งยืนยันทุกฝ่าย</div>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="step-left">
-          <div class="step-num">4</div>
-          <div class="step-line" style="background:transparent"></div>
-        </div>
-        <div class="step-body">
-          <div class="step-title">แจ้งผลและสรุปรอบ</div>
-          <div class="step-desc">แอดมินพิมพ์ "แจ้งผล 365" บอทคิดผล หักกำไร สรุปยอด และแจ้งลูกค้าทุกคนพร้อมกัน</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- SLIP AUTO TOPUP -->
-<section id="slip">
-  <div class="container">
-    <div class="fade-in" style="margin-bottom:2.5rem">
-      <div class="section-pill">ไฮไลต์</div>
-      <h2>ตรวจสลิปอัตโนมัติ<br>กันสลิปปลอม 100%</h2>
-      <p class="section-desc">ใช้ EasySlip API ตรวจสลิปจริงจากธนาคาร เติมเครดิตให้ทันที ไม่ต้องรอแอดมินตรวจเอง</p>
-    </div>
-
-    <div class="slip-wrap fade-in">
-      <div class="slip-card">
-        <div class="slip-card-header">
-          <div class="slip-dot"></div>
-          <div class="slip-header-text">ตรวจสลิปสำเร็จ — เติมเครดิตแล้ว</div>
-        </div>
-        <div class="slip-body">
-          <div class="slip-row">
-            <span class="slip-key">ผู้โอน</span>
-            <span class="slip-val">สมชาย ใจดี</span>
-          </div>
-          <div class="slip-row">
-            <span class="slip-key">บัญชีผู้รับ</span>
-            <span class="slip-val" style="color:var(--green)">✓ ตรงแล้ว</span>
-          </div>
-          <div class="slip-row">
-            <span class="slip-key">ยอดโอน</span>
-            <span class="slip-val" style="color:var(--green)">฿500.00</span>
-          </div>
-          <div class="slip-row">
-            <span class="slip-key">เครดิตที่ได้</span>
-            <span class="slip-val" style="color:var(--accent)">500 เครดิต</span>
-          </div>
-          <div class="slip-row">
-            <span class="slip-key">สลิปซ้ำ</span>
-            <span class="slip-val" style="color:var(--green)">✓ ไม่ซ้ำ</span>
-          </div>
-          <div class="slip-row">
-            <span class="slip-key">สถานะ</span>
-            <span class="slip-val" style="color:var(--green)">✓ เติมเรียบร้อย</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="info-list">
-        <div class="info-item">
-          <div class="info-icon">🔍</div>
-          <div class="info-text"><strong>ตรวจสลิปจริงจากธนาคาร</strong> — ไม่ใช่แค่อ่าน OCR แต่ตรวจกับ API โดยตรง สลิปแคปหน้าจอหรือแก้ไขไม่ผ่าน</div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon">♻️</div>
-          <div class="info-text"><strong>กันสลิปซ้ำ</strong> — ส่งสลิปเดิมซ้ำกี่ครั้งก็ไม่เติมเครดิตซ้ำ ระบบจำ Transaction ID ไว้</div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon">⚡</div>
-          <div class="info-text"><strong>เติมทันที ไม่รอแอดมิน</strong> — ลูกค้าส่งสลิป ระบบตรวจและเติมให้ภายในวินาที</div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon">🏦</div>
-          <div class="info-text"><strong>ตรวจบัญชีผู้รับ</strong> — ตั้งเลขบัญชีไว้ ถ้าโอนผิดบัญชีจะไม่เติมและแจ้งเตือนทันที</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- STATS + RELIABILITY -->
-<section style="background:var(--bg2)">
-  <div class="container">
-    <div class="fade-in" style="text-align:center;margin-bottom:2rem">
-      <div class="section-pill">ความเสถียร</div>
-      <h2>ออกแบบมาเพื่อ<br>ใช้งานจริง</h2>
-    </div>
-
-    <div class="stats-row fade-in">
-      <div class="stat-card">
-        <div class="stat-num">24/7</div>
-        <div class="stat-label">ทำงานตลอด</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">0</div>
-        <div class="stat-label">คำนวณเอง</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">∞</div>
-        <div class="stat-label">รอบต่อวัน</div>
-      </div>
-    </div>
-
-    <div class="features-grid fade-in" style="max-width:520px;margin:0 auto">
-      <div class="feat-card">
-        <div class="feat-icon">🔐</div>
-        <div class="feat-title">ยืนยัน 2 ชั้น</div>
-        <div class="feat-desc">คำสั่งสำคัญต้องยืนยันซ้ำ กัน admin พิมพ์ผิดพลาด</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">⚙️</div>
-        <div class="feat-title">Thread-safe</div>
-        <div class="feat-desc">รองรับผู้ใช้พร้อมกันหลายคน ไม่มีข้อมูลสลับกัน</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🌐</div>
-        <div class="feat-title">Multi-Group</div>
-        <div class="feat-desc">หลายกลุ่มหน้าบ้าน หลายค่าย แยกกันชัดเจน</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🔕</div>
-        <div class="feat-title">Quiet Mode</div>
-        <div class="feat-desc">บอทไม่ตอบสแปม ตอบเฉพาะคำสั่งจริงๆ เท่านั้น</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- PRICING -->
-<section id="pricing">
-  <div class="container">
-    <div class="fade-in" style="text-align:center;margin-bottom:2.5rem">
-      <div class="section-pill">แพ็กเกจ</div>
-      <h2>เลือกแพ็กเกจ<br>ที่เหมาะกับคุณ</h2>
-      <p class="section-desc" style="margin:0.5rem auto 0">บอทราคาถูก!</p>
-    </div>
-
-    <div class="pricing-wrap fade-in">
-      <div class="price-card">
-        <div class="price-tier">Starter</div>
-        <div class="price-num">ติดต่อ</div>
-        <div class="price-note">สำหรับกลุ่มเล็ก 1 ค่าย</div>
-        <ul class="price-list">
-          <li>ระบบรับแทง-จับคู่-แจ้งผล</li>
-          <li>เติมเครดิตผ่านสลิป</li>
-          <li>หลังบ้าน 1 กลุ่ม</li>
-          <li>รองรับ 1 ค่าย</li>
-          <li class="dim">หลายค่ายพร้อมกัน</li>
-          <li class="dim">Custom ฟีเจอร์</li>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-accent" style="background:var(--coral);"></div>
+        <div class="card-tag" style="background:var(--coral-dim);color:var(--coral);">BACKOFFICE</div>
+        <h3>กลุ่มหลังบ้าน</h3>
+        <ul class="item-list">
+          <li>คำสั่งระบบ: <strong>CK / CR / ยอดกำไร</strong></li>
+          <li>เติม-หักเครดิต: <strong>$+ / $-</strong></li>
+          <li>ดูยอดลูกค้า: <strong>CALL</strong></li>
+          <li>ล้างออเดอร์ / CLEAR ALL</li>
+          <li>จัดการแอดมิน ADDADMIN / RMADMIN</li>
         </ul>
-        <a href="#contact" class="btn btn-ghost" style="width:100%;justify-content:center">สอบถามราคา</a>
+        <div style="margin-top:14px;"><span class="pill pill-coral">Admin เท่านั้น</span></div>
       </div>
-
-      <div class="price-card featured">
-        <div class="price-popular">⭐ แนะนำ</div>
-        <div class="price-tier">Full Package</div>
-        <div class="price-num">ติดต่อ</div>
-        <div class="price-note">ฟีเจอร์ครบ + ติดตั้งให้</div>
-        <ul class="price-list">
-          <li>ระบบรับแทง-จับคู่-แจ้งผล</li>
-          <li>เติมเครดิตผ่านสลิป</li>
-          <li>หลังบ้านหลายกลุ่ม</li>
-          <li>รองรับหลายค่ายพร้อมกัน</li>
-          <li>Auto Backup + กัน Duplicate</li>
-          <li>ติดตั้งและ Setup ให้</li>
-          <li>Custom ตามต้องการ</li>
+      <div class="card">
+        <div class="card-accent" style="background:var(--teal);"></div>
+        <div class="card-tag" style="background:var(--teal-dim);color:var(--teal);">FRONT GROUP</div>
+        <h3>กลุ่มหน้าบ้าน</h3>
+        <ul class="item-list">
+          <li>เปิด / ปิดรอบค่าย</li>
+          <li>แจ้งราคาช่าง / ผล</li>
+          <li>ลูกค้าโพสต์แผล (ชล/ชถ)</li>
+          <li>ลูกค้าตอบ <strong>ต / ติด</strong> จับคู่</li>
+          <li>ดูผลบั้งไฟ / LISTPLAY</li>
         </ul>
-        <a href="#contact" class="btn btn-primary" style="width:100%;justify-content:center">ติดต่อสอบถาม ↗</a>
+        <div style="margin-top:14px;"><span class="pill pill-teal">Admin + ลูกค้า</span></div>
       </div>
-    </div>
-
-    <div class="tech-row fade-in" style="justify-content:center;margin-top:2rem">
-      <span class="tech-badge">Python 3</span>
-      <span class="tech-badge">Flask</span>
-      <span class="tech-badge">LINE Messaging API v3</span>
-      <span class="tech-badge">EasySlip API</span>
-      <span class="tech-badge">ThreadPoolExecutor</span>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- FAQ -->
-<section style="background:var(--bg2)" id="faq">
-  <div class="container">
-    <div class="fade-in" style="text-align:center;margin-bottom:2rem">
-      <div class="section-pill">FAQ</div>
-      <h2>คำถามที่พบบ่อย</h2>
-    </div>
-
-    <div class="faq-list fade-in">
-      <div class="faq-item">
-        <div class="faq-q">ต้องมีความรู้เทคนิคในการติดตั้งไหม?</div>
-        <div class="faq-a"><div class="faq-a-inner">ไม่จำเป็น — แพ็กเกจ Full Package รวมบริการติดตั้งและ setup LINE OA ให้ทั้งหมด คุณแค่ต้องมี LINE Official Account ที่ verified แล้ว</div></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">ใช้งานกับ LINE OA แบบไหนได้บ้าง?</div>
-        <div class="faq-a"><div class="faq-a-inner">รองรับ LINE Official Account ทุกแพ็กเกจที่เปิดใช้ Messaging API ได้ ทั้งแบบ Free และ Premium</div></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">ข้อมูลลูกค้าและบิลเก็บไว้ที่ไหน?</div>
-        <div class="faq-a"><div class="faq-a-inner">ข้อมูลทั้งหมดเก็บในเซิร์ฟเวอร์ของคุณเองเท่านั้น ไม่มีการส่งข้อมูลออกไปยังบุคคลที่สาม มีระบบ Auto Backup เพื่อป้องกันข้อมูลสูญหาย</div></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">ถ้าบอทค้างหรือรีสตาร์ท ข้อมูลหายไหม?</div>
-        <div class="faq-a"><div class="faq-a-inner">ไม่หาย — ระบบ Auto Backup บันทึกทุกรอบและทุก state อัตโนมัติลงไฟล์ เมื่อรีสตาร์ทบอทจะโหลดข้อมูลล่าสุดขึ้นมาต่อได้ทันที</div></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">สลิปปลอมหรือสลิปซ้ำจัดการยังไง?</div>
-        <div class="faq-a"><div class="faq-a-inner">ระบบตรวจสลิปผ่าน EasySlip API โดยตรง ไม่ใช่แค่อ่านตัวเลข สลิปที่แคปหน้าจอหรือแก้ไขจะไม่ผ่าน และระบบจำ Transaction ID กัน ส่งสลิปซ้ำ</div></div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--blue);"></div>
+        <div class="card-tag" style="background:var(--blue-dim);color:var(--blue);">PRIVATE CHAT</div>
+        <h3>แชทส่วนตัวกับบอท</h3>
+        <ul class="item-list">
+          <li>ส่งสลิปเพื่อเติมเครดิต</li>
+          <li>ระบบ EasySlip ตรวจอัตโนมัติ</li>
+          <li>แจ้งผลทันทีหลังผ่านการตรวจ</li>
+          <li>ต้องลงทะเบียน ID ก่อนส่งสลิป</li>
+          <li>ดูยอดเครดิต: <strong>บช / บัญชี</strong></li>
+        </ul>
+        <div style="margin-top:14px;"><span class="pill pill-blue">ลูกค้าที่มี ID</span></div>
       </div>
     </div>
   </div>
-</section>
 
-<div class="divider"></div>
-
-<!-- CTA / CONTACT -->
-<section class="cta-section" id="contact">
-  <div class="container">
-    <div class="cta-box fade-in">
-      <div class="cta-title">พร้อมใช้งานแล้ว?</div>
-      <p class="cta-desc">ติดต่อสอบถามราคา รายละเอียด หรือสั่งซื้อได้เลย มีบริการติดตั้งและ customize ตามต้องการ</p>
-
-      <div class="contact-links">
-        <a href="https://line.me/ti/p/tSfaMnn2np" class="contact-link">
-          <span class="icon">💬</span>
-          <span>ติดต่อผ่าน LINE</span>
-          <span class="arrow">→</span>
-        </a>
-        <a href="https://line.me/ti/p/tSfaMnn2np" class="contact-link">
-          <span class="icon">📱</span>
-          <span>ติดต่อผ่าน LINE</span>
-          <span class="arrow">→</span>
-        </a>
+  <!-- ── SECTION 2: ขั้นตอนรอบ ── -->
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--purple-dim);">⚡</div>
+      <div><h2>ขั้นตอนการบริหารรอบ</h2><p>ไหลสมบูรณ์ตั้งแต่เปิดจนเคลียร์</p></div>
+    </div>
+    <div class="flow">
+      <div class="flow-step" style="background:linear-gradient(135deg,#1a1f2e,#131920);">
+        <div class="flow-n">01</div>
+        <div class="flow-t">เปิดค่าย</div>
+        <div class="flow-s">เปิด [ชื่อค่าย]</div>
       </div>
-
-      <p style="font-size:12.5px;color:var(--text3);margin-top:1.2rem">ตอบกลับภายใน 1–2 ชั่วโมง • มีบริการหลังการขาย</p>
+      <div class="flow-step">
+        <div class="flow-n">02</div>
+        <div class="flow-t">ราคาช่าง</div>
+        <div class="flow-s">ราคาช่าง 330-360<br>+ เริ่มต้น3</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">03</div>
+        <div class="flow-t">ลูกค้าแทง</div>
+        <div class="flow-s">ชล500 / ชถ1000<br>ตอบ ต/ติด</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">04</div>
+        <div class="flow-t">ปิดค่าย</div>
+        <div class="flow-s">ปิด / เล่นต่อ</div>
+      </div>
+      <div class="flow-step" style="background:linear-gradient(135deg,#1f1a10,#131920);">
+        <div class="flow-n" style="color:var(--amber);">05</div>
+        <div class="flow-t">แจ้งผล</div>
+        <div class="flow-s">แจ้งผล [ค่าย] 365<br>จาวทุกแผล</div>
+      </div>
+      <div class="flow-step" style="background:linear-gradient(135deg,#1f1a10,#131920);">
+        <div class="flow-n" style="color:var(--amber);">06</div>
+        <div class="flow-t">ยืนยัน</div>
+        <div class="flow-s">แจ้งผล 2 ครั้ง<br>คิดเครดิต</div>
+      </div>
+      <div class="flow-step" style="background:linear-gradient(135deg,#0f1a14,#131920);">
+        <div class="flow-n" style="color:var(--green);">07</div>
+        <div class="flow-t">สรุปผล</div>
+        <div class="flow-s">ตารางผล<br>ชนะ/แพ้/จาว</div>
+      </div>
+      <div class="flow-step" style="background:linear-gradient(135deg,#0f1a14,#131920);">
+        <div class="flow-n" style="color:var(--green);">08</div>
+        <div class="flow-t">CR เคลียร์</div>
+        <div class="flow-s">CR → ยืนยัน<br>ล้างรอบ</div>
+      </div>
+    </div>
+    <div class="info-box" style="background:var(--gold-dim);border:1px solid rgba(232,184,75,0.2);margin-top:16px;">
+      <div class="icon">💡</div>
+      <p><strong>Multi-base:</strong> รองรับหลายค่ายพร้อมกัน ใช้คำว่า <strong>ฐาน1 / ฐาน2</strong> หรือชื่อค่ายโดยตรงในคำสั่ง เช่น <code style="color:var(--gold);">แจ้งผล ส.แก่นนภา 365</code> — บอทหาฐานให้อัตโนมัติ</p>
     </div>
   </div>
-</section>
+
+  <!-- ── SECTION 3: คำสั่ง Admin ── -->
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--amber-dim);">⚙️</div>
+      <div><h2>คำสั่ง Admin</h2><p>พิมพ์ในกลุ่มหลังบ้านหรือหน้าบ้าน (ตามสิทธิ์)</p></div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab(this,'tab-round')">บริหารรอบ</button>
+      <button class="tab" onclick="switchTab(this,'tab-result')">แจ้งผล / ย้อนผล</button>
+      <button class="tab" onclick="switchTab(this,'tab-credit')">เครดิต / สมาชิก</button>
+      <button class="tab" onclick="switchTab(this,'tab-sys')">ระบบ / Debug</button>
+    </div>
+
+    <div id="tab-round" class="tab-content active">
+      <div class="grid-2">
+        <div class="card">
+          <h3>เปิด / ปิดรอบ</h3>
+          <table class="cmd-table">
+            <tr><td>เปิด [ชื่อ]</td><td>เปิดรอบค่ายใหม่</td></tr>
+            <tr><td>ปิด</td><td>ปิดรอบปัจจุบัน</td></tr>
+            <tr><td>ปิด ฐาน2</td><td>ปิดรอบฐาน 2 โดยเฉพาะ</td></tr>
+            <tr><td>เล่นต่อ</td><td>เปิดให้เล่นต่อหลังปิด</td></tr>
+            <tr><td>เปลี่ยนค่าย [ชื่อ]</td><td>เปลี่ยนชื่อค่ายในรอบ</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>ราคาช่าง</h3>
+          <table class="cmd-table">
+            <tr><td>ราคาช่าง 330-360</td><td>ตั้งราคาช่างปกติ</td></tr>
+            <tr><td>เริ่มต้น3</td><td>เลขแผล 2 หลักเริ่ม 3xx</td></tr>
+            <tr><td>ราคาช่าง ไม่ต่อย</td><td>ช่างไม่มีราคา (ไม่ต่อย)</td></tr>
+            <tr><td>ราคาช่าง ไม่ตี</td><td>ช่างไม่มีราคา (ไม่ตี)</td></tr>
+            <tr><td>ราคาช่าง ไม่มีราคา</td><td>ช่างไม่ออกราคา</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>ดูสถานะ CK</h3>
+          <table class="cmd-table">
+            <tr><td>CK</td><td>สถานะรอบปัจจุบัน</td></tr>
+            <tr><td>CK ฐาน2</td><td>สถานะฐาน 2</td></tr>
+            <tr><td>CK รวม</td><td>สรุปทุกฐานพร้อมกัน</td></tr>
+            <tr><td>LISTPLAY</td><td>รายการคู่แทงทั้งหมด</td></tr>
+            <tr><td>คู่ติด</td><td>คู่ที่จับคู่สำเร็จแล้ว</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>ยอดกำไร</h3>
+          <table class="cmd-table">
+            <tr><td>ยอดกำไร</td><td>ดูยอดกำไรสะสม + รายละเอียดรอบ</td></tr>
+            <tr><td>กำไร</td><td>ชื่อย่อ ยอดกำไร</td></tr>
+            <tr><td>ล้างกำไร</td><td>รีเซ็ตยอดกำไรสะสม</td></tr>
+            <tr><td>ผลบั้งไฟ</td><td>ตารางผลบั้งไฟทุกค่าย</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-result" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <h3>แจ้งผลปกติ</h3>
+          <table class="cmd-table">
+            <tr><td>แจ้งผล 365</td><td>ผลรอบปัจจุบัน (ต้องกด 2 ครั้ง)</td></tr>
+            <tr><td>แจ้งผล [ค่าย] 365</td><td>ระบุค่ายในคำสั่ง</td></tr>
+            <tr><td>แจ้งผล ฐาน2 365</td><td>ระบุฐาน</td></tr>
+            <tr><td>ผล 365</td><td>ชื่อย่อ แจ้งผล</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>ผลพิเศษ</h3>
+          <table class="cmd-table">
+            <tr><td>แจ้งผล จาวทุกแผล</td><td>จาวทั้งรอบ ไม่คิดเครดิต</td></tr>
+            <tr><td>แจ้งผล บั้งไฟหาย</td><td>บั้งไฟหายก่อนจะรู้ผล</td></tr>
+            <tr><td>แจ้งผล [ค่าย] จาวทุกแผล</td><td>จาวเฉพาะค่ายนั้น</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>ย้อนผล</h3>
+          <table class="cmd-table">
+            <tr><td>ย้อนผล</td><td>ขอย้อนผลรอบนี้ (ต้องยืนยัน)</td></tr>
+            <tr><td>ยืนยันย้อนผล</td><td>ยืนยันการย้อนผล</td></tr>
+            <tr><td>ยกเลิกย้อนผล</td><td>ยกเลิกคำขอย้อนผล</td></tr>
+            <tr><td>ย้อนผล [ชื่อค่าย]</td><td>ย้อนผลระบุค่าย</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>ล้างรอบ (CR)</h3>
+          <table class="cmd-table">
+            <tr><td>CR</td><td>ขอเคลียร์รอบ (ต้องยืนยัน)</td></tr>
+            <tr><td>ยืนยัน</td><td>ยืนยัน CR / ล้างรอบ</td></tr>
+            <tr><td>CR ฐาน1</td><td>เคลียร์รอบเฉพาะฐาน</td></tr>
+            <tr><td>ล้างออเดอร์</td><td>ล้างคำสั่งแทงทั้งหมด</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-credit" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <h3>เติม / หักเครดิต</h3>
+          <table class="cmd-table">
+            <tr><td>$+ [ID] [จำนวน]</td><td>เติมเครดิตให้ลูกค้า</td></tr>
+            <tr><td>$- [ID] [จำนวน]</td><td>หักเครดิตจากลูกค้า</td></tr>
+            <tr><td>$+ 41 259</td><td>ตัวอย่าง: เติม 259 ให้ ID 41</td></tr>
+            <tr><td>$- 66 2762</td><td>ตัวอย่าง: หัก 2762 จาก ID 66</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>ดูข้อมูลลูกค้า</h3>
+          <table class="cmd-table">
+            <tr><td>CALL</td><td>รายชื่อลูกค้าที่มีเครดิต</td></tr>
+            <tr><td>Call</td><td>เหมือนกัน ไม่ต้องพิมพ์ตัวใหญ่</td></tr>
+          </table>
+          <div class="info-box" style="background:var(--blue-dim);border:1px solid rgba(96,165,250,0.2);margin-top:12px;">
+            <div class="icon">📊</div>
+            <p>CALL แสดง: จำนวนลูกค้า, เครดิตคงเหลือรวม, กำลังใช้อยู่</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>จัดการแอดมิน</h3>
+          <table class="cmd-table">
+            <tr><td>ADDADMIN [UID]</td><td>เพิ่มแอดมินใหม่</td></tr>
+            <tr><td>RMADMIN [UID]</td><td>ลบแอดมิน</td></tr>
+            <tr><td>LISTADMIN</td><td>รายชื่อแอดมินทั้งหมด</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>คำสั่งลูกค้า (เครดิต)</h3>
+          <table class="cmd-table">
+            <tr><td>บช / บัญชี</td><td>ดูยอดเครดิตตัวเอง</td></tr>
+            <tr><td>ถอน [จำนวน]</td><td>ขอถอนเครดิต</td></tr>
+            <tr><td>รอถอน</td><td>ดูรายการรอถอน</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-sys" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <h3>คำสั่งระบบ</h3>
+          <table class="cmd-table">
+            <tr><td>CLEAR ALL</td><td>ล้างทุกอย่าง (รอบ+สกอ+backup)</td></tr>
+            <tr><td>คำสั่ง</td><td>แสดงคำสั่งแอดมินทั้งหมด</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Multi-base คำสั่งฐาน</h3>
+          <table class="cmd-table">
+            <tr><td>เปิด ฐาน1 [ค่าย]</td><td>เปิดรอบระบุฐาน</td></tr>
+            <tr><td>ปิด ฐาน2</td><td>ปิดฐาน 2</td></tr>
+            <tr><td>ราคาช่าง ฐาน1 330-360</td><td>ราคาช่างเฉพาะฐาน</td></tr>
+            <tr><td>CK ฐาน1 / CK รวม</td><td>ดูสถานะฐาน</td></tr>
+            <tr><td>แจ้งผล ฐาน2 420</td><td>ผลเฉพาะฐาน</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 4: วิธีเล่น ── -->
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--teal-dim);">🎯</div>
+      <div><h2>วิธีเล่นของลูกค้า</h2><p>ในกลุ่มหน้าบ้าน</p></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--blue));"></div>
+        <h3>📣 โพสต์แผล (เสนอจับคู่)</h3>
+        <table class="cmd-table" style="margin-bottom:12px;">
+          <tr><td>ชล500</td><td>เดิมพัน 500 ฝั่ง <strong>ชนะช่าง</strong></td></tr>
+          <tr><td>ชถ1000</td><td>เดิมพัน 1000 ฝั่ง <strong>ชนะถูก</strong></td></tr>
+          <tr><td>ชล500ชถ300</td><td>แยกยอดทั้ง 2 ฝั่ง</td></tr>
+        </table>
+        <div class="info-box" style="background:var(--teal-dim);border:1px solid rgba(45,212,191,0.2);">
+          <div class="icon">ℹ️</div>
+          <p>บอทจะโพสต์แผลในกลุ่ม รอคนอื่น Reply มาตอบ <strong>ต</strong> หรือ <strong>ติด</strong><br>เครดิตถูกหักทันทีที่จับคู่สำเร็จ</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:linear-gradient(90deg,var(--amber),var(--gold));"></div>
+        <h3>✅ ตอบ ติด / ต (จับคู่)</h3>
+        <table class="cmd-table" style="margin-bottom:12px;">
+          <tr><td>ต</td><td>ติดเต็มยอดที่โพสต์</td></tr>
+          <tr><td>ติด</td><td>เหมือนกัน</td></tr>
+          <tr><td>ต 300</td><td>ติดบางส่วน 300</td></tr>
+          <tr><td>ติด 300</td><td>เหมือนกัน</td></tr>
+        </table>
+        <div class="info-box" style="background:var(--amber-dim);border:1px solid rgba(251,191,36,0.2);">
+          <div class="icon">⚠️</div>
+          <p>ต้อง <strong>Reply โพสต์แผล</strong> แล้วค่อยพิมพ์ ต/ติด<br>ขอยกเลิก: กดปุ่ม "ขอยกเลิก" → Admin อนุมัติ</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 5: เครดิต ── -->
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--green-dim);">💰</div>
+      <div><h2>ระบบเครดิต</h2><p>เติม / หัก / Commission</p></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-accent" style="background:var(--green);"></div>
+        <h3>💳 เติมเครดิต (Auto-Slip)</h3>
+        <div class="credit-flow">
+          <div class="cf-box">
+            <div class="lbl">ลูกค้า</div>
+            <div class="val" style="color:var(--text2);">ส่งสลิป</div>
+          </div>
+          <div class="cf-arrow">→</div>
+          <div class="cf-box">
+            <div class="lbl">EasySlip API</div>
+            <div class="val" style="color:var(--blue);">ตรวจสอบ</div>
+          </div>
+          <div class="cf-arrow">→</div>
+          <div class="cf-box">
+            <div class="lbl">บอท</div>
+            <div class="val" style="color:var(--green);">เติมเครดิต</div>
+          </div>
+        </div>
+        <ul class="item-list" style="margin-top:14px;">
+          <li>1 บาท = 1 เครดิต (ตั้งค่าได้ AUTO_TOPUP_RATE)</li>
+          <li>ขั้นต่ำ MIN_TOPUP_AMOUNT (ค่าเริ่มต้น 1 บาท)</li>
+          <li>ตรวจซ้ำ/slip ID กัน double-credit อัตโนมัติ</li>
+          <li>ต้องมี ID สมาชิกก่อนส่งสลิป</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--coral);"></div>
+        <h3>📉 การหักและ Commission</h3>
+        <ul class="item-list">
+          <li>ฝ่าย <strong>แพ้</strong>: ไม่ได้เครดิต เสียเครดิตที่แทง</li>
+          <li>ฝ่าย <strong>ชนะ</strong>: ได้เครดิตเพิ่ม แต่ถูกหัก Commission</li>
+          <li>Commission ค่าเริ่มต้น: <strong>5%</strong> (ตั้งค่าได้)</li>
+          <li>จาว: คืนเครดิตทั้งคู่ ไม่หัก Commission</li>
+          <li>Admin หัก: <strong>$- [ID] [จำนวน]</strong></li>
+        </ul>
+        <div class="info-box" style="background:var(--gold-dim);border:1px solid rgba(232,184,75,0.2);margin-top:12px;">
+          <div class="icon">📊</div>
+          <p>ดูยอดกำไรสะสมระบบ (จาก Commission): <strong>ยอดกำไร</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 6: ผลบั้งไฟ ── -->
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--amber-dim);">🎆</div>
+      <div><h2>ตัวอย่างตารางผลบั้งไฟ</h2><p>วันที่ 01/06/2026</p></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:16px 20px; background:var(--card2); border-bottom:1px solid var(--border); display:flex; gap:16px; align-items:center;">
+        <span style="font-family:var(--font-th);font-size:15px;font-weight:600;">📋 ผลบั้งไฟ</span>
+        <span class="pill pill-green">ชนะ 7</span>
+        <span class="pill pill-coral">แพ้ 7</span>
+        <span class="pill" style="background:rgba(148,163,184,0.1);border-color:rgba(148,163,184,0.2);color:var(--text2);">จาว 3</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>#</th><th>ชื่อค่าย</th><th>ราคาช่าง</th><th>เริ่มต้น</th><th>ผล</th><th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>กูตรัน</td><td>330-360</td><td>เริ่มต้น3</td><td>285</td><td><span class="badge badge-lose">✗ แพ้</span></td></tr>
+            <tr><td>2</td><td>แอ็ดเทวดา</td><td>360-400</td><td>เริ่มต้น3</td><td>395</td><td><span class="badge badge-draw">— จาว</span></td></tr>
+            <tr><td>3</td><td>เทพเจริญ</td><td>320-360</td><td>เริ่มต้น3</td><td>400</td><td><span class="badge badge-win">✓ ชนะ</span></td></tr>
+            <tr><td>4</td><td>เทพญาตา</td><td>340-380</td><td>เริ่มต้น3</td><td>205</td><td><span class="badge badge-lose">✗ แพ้</span></td></tr>
+            <tr><td>5</td><td>ทองภัคดิ</td><td>330-370</td><td>เริ่มต้น3</td><td>420</td><td><span class="badge badge-win">✓ ชนะ</span></td></tr>
+            <tr><td>6</td><td>เขยวังหิน</td><td>330-360</td><td>เริ่มต้น3</td><td>250</td><td><span class="badge badge-lose">✗ แพ้</span></td></tr>
+            <tr><td>7</td><td>โพธิ์เจริญ</td><td>345-385</td><td>เริ่มต้น3</td><td>515</td><td><span class="badge badge-win">✓ ชนะ</span></td></tr>
+            <tr><td>8</td><td>สามเทพเมือก</td><td>350-410</td><td>เริ่มต้น3</td><td>45</td><td><span class="badge badge-lose">✗ แพ้</span></td></tr>
+            <tr><td>9</td><td>กระรอกน้อย</td><td>345-390</td><td>เริ่มต้น3</td><td>350</td><td><span class="badge badge-draw">— จาว</span></td></tr>
+            <tr><td>10</td><td>ส.ราชวงส์</td><td>350-390</td><td>เริ่มต้น3</td><td>150</td><td><span class="badge badge-lose">✗ แพ้</span></td></tr>
+            <tr><td>11</td><td>ภูผาฟาร์ม</td><td>335-365</td><td>เริ่มต้น3</td><td>405</td><td><span class="badge badge-win">✓ ชนะ</span></td></tr>
+            <tr><td>12</td><td>ช้างเมือก</td><td>345-390</td><td>เริ่มต้น3</td><td>415</td><td><span class="badge badge-win">✓ ชนะ</span></td></tr>
+            <tr><td>13</td><td>ห้องปกป้อง+วังสันติสุข</td><td>350-395</td><td>เริ่มต้น3</td><td>435</td><td><span class="badge badge-win">✓ ชนะ</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);">
+      <p style="font-size:13px;color:var(--text2);">
+        <strong style="color:var(--text);">ตรรกะคิดผล:</strong>
+        ผลอยู่ในช่วงราคา = จาว &nbsp;|&nbsp;
+        ผลมากกว่า Max = ชนะช่าง ✓ &nbsp;|&nbsp;
+        ผลน้อยกว่า Min = ชนะถูก ✗ &nbsp;|&nbsp;
+        แผล ชัย: เล่นเฉพาะตอน ไม่มีราคาช่างจาวในช่วงทันที
+      </p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 7: CK / ข้อมูลรอบ ── -->
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--blue-dim);">🔍</div>
+      <div><h2>ระบบ CK — ตรวจสอบสถานะรอบ</h2><p>ตัวอย่างข้อมูลที่แสดง</p></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>ฟิลด์ที่ CK แสดง</h3>
+        <table class="cmd-table">
+          <tr><td>ค่าย</td><td>ชื่อค่ายที่กำลังเปิด</td></tr>
+          <tr><td>ห้องรอบ</td><td>round_id (hash ไม่ซ้ำ)</td></tr>
+          <tr><td>สถานะ</td><td>เปิดอยู่ / ปิดแล้ว</td></tr>
+          <tr><td>ราคาช่าง</td><td>ช่วงราคา เช่น 340-395</td></tr>
+          <tr><td>ผล</td><td>ผลที่แจ้งแล้ว (None = ยังไม่มี)</td></tr>
+          <tr><td>แผลสมบูรณ์</td><td>จำนวนคู่ที่จับคู่ครบ</td></tr>
+          <tr><td>ที่คิดผลแล้ว</td><td>คู่ที่คิดเครดิตเสร็จ</td></tr>
+          <tr><td>แผลรอ</td><td>คู่รอแจ้งผลอยู่</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>ตัวอย่าง CK จริง (จากภาพ)</h3>
+        <div style="background:var(--bg3);border-radius:var(--r2);padding:14px;font-size:13px;line-height:1.8;font-family:var(--font-body);">
+          <div><span style="color:var(--text3);">CK | สถานะรอบปัจจุบัน</span></div>
+          <div><span style="color:var(--text2);">ค่าย:</span> ส.แก่นนภา</div>
+          <div><span style="color:var(--text2);">ห้องรอบ:</span> <span style="color:var(--text3);font-size:11px;">Cb23b6c262c9e2efb6ec...</span></div>
+          <div><span style="color:var(--text2);">สถานะ:</span> <span style="color:var(--green);">เปิดอยู่</span></div>
+          <div><span style="color:var(--text2);">ราคาช่าง:</span> <span style="color:var(--gold);">-</span> (ยังไม่แจ้ง)</div>
+          <div><span style="color:var(--text2);">แผลสมบูรณ์รอคิดผล:</span> 22</div>
+          <div><span style="color:var(--text2);">ที่คิดผลแล้ว:</span> 0</div>
+          <div><span style="color:var(--text2);">แผลรอปัจจุบัน:</span> 19</div>
+          <div><span style="color:var(--text2);">แผล ชัย รอคิดผล:</span> 0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 8: Backup ── -->
+  <div class="section reveal">
+    <div class="sec-title">
+      <div class="sec-icon" style="background:var(--purple-dim);">🛡️</div>
+      <div><h2>ระบบ Backup & ความเสถียร</h2><p>การเก็บข้อมูลและกันพัง</p></div>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <h3>📁 ไฟล์ข้อมูล</h3>
+        <ul class="item-list">
+          <li><strong>users.json</strong> — UID / ชื่อ / เครดิต</li>
+          <li><strong>profit.json</strong> — ยอดกำไร Commission</li>
+          <li><strong>order_state.json</strong> — state ออเดอร์</li>
+          <li><strong>round_backups/</strong> — backup รายรอบ</li>
+          <li><strong>admins.json</strong> — รายชื่อแอดมิน</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🔒 กัน Duplicate</h3>
+        <ul class="item-list">
+          <li>Message ID cache — กัน LINE retry</li>
+          <li>Slip ID — กัน double top-up</li>
+          <li>STATE_LOCK — กัน race condition</li>
+          <li>TTL 10 นาที ล้าง message cache</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>⚡ Performance</h3>
+        <ul class="item-list">
+          <li>ThreadPoolExecutor — push ไม่บล็อก</li>
+          <li>LINE reply timeout 4 วินาที</li>
+          <li>Profile fetch cooldown 120 วิ</li>
+          <li>Retry LINE API 2 ครั้งอัตโนมัติ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <!-- FOOTER -->
 <footer>
-  <div>BotBill Pro — LINE Bot จัดการบิลอัตโนมัติ</div>
-  <div>Python • Flask • LINE Messaging API v3 • EasySlip</div>
+  <div class="wrap">
+    <p style="margin-bottom:8px;">
+      ระบบบอท <span>สรุปยอดอีสาน OG</span> · ทำงานบน LINE Webhook + Flask + Python
+    </p>
+    <p style="font-size:12px;">EasySlip · Multi-base Round System · Auto Credit · LINE Flex Message</p>
+  </div>
 </footer>
 
 <script>
-  // Scroll fade-in
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
+  function switchTab(btn, id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
       if (e.isIntersecting) {
-        e.target.classList.add('visible');
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
         observer.unobserve(e.target);
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.08 });
 
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-  // Trigger hero mockup immediately
-  setTimeout(() => {
-    document.querySelector('.hero .fade-in')?.classList.add('visible');
-  }, 300);
-
-  // FAQ accordion
-  document.querySelectorAll('.faq-q').forEach(q => {
-    q.addEventListener('click', () => {
-      const item = q.parentElement;
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    });
-  });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 </body>
 </html>
